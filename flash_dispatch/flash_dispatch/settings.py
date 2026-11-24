@@ -125,26 +125,43 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-CLOUDINARY_CLOUD_NAME  = os.environ.get('CLOUDINARY_CLOUD_NAME', config('CLOUDINARY_CLOUD_NAME', default=''))
-CLOUDINARY_API_KEY     = os.environ.get('CLOUDINARY_API_KEY',    config('CLOUDINARY_API_KEY',    default=''))
-CLOUDINARY_API_SECRET  = os.environ.get('CLOUDINARY_API_SECRET', config('CLOUDINARY_API_SECRET', default=''))
+CLOUDINARY_CLOUD_NAME = os.environ.get(
+    'CLOUDINARY_CLOUD_NAME',
+    config('CLOUDINARY_CLOUD_NAME', default='')
+)
+
+CLOUDINARY_API_KEY = os.environ.get(
+    'CLOUDINARY_API_KEY',
+    config('CLOUDINARY_API_KEY', default='')
+)
+
+CLOUDINARY_API_SECRET = os.environ.get(
+    'CLOUDINARY_API_SECRET',
+    config('CLOUDINARY_API_SECRET', default='')
+)
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
-    'API_KEY':    CLOUDINARY_API_KEY,
+    'API_KEY': CLOUDINARY_API_KEY,
     'API_SECRET': CLOUDINARY_API_SECRET,
     'SECURE': True,
 }
 
-# Use Cloudinary if credentials exist — no extra env flag to forget.
-_use_cloudinary = bool(CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET)
+# Use Cloudinary when credentials are available
+_use_cloudinary = bool(
+    CLOUDINARY_CLOUD_NAME
+    and CLOUDINARY_API_KEY
+    and CLOUDINARY_API_SECRET
+)
 
-# Django 4.2 — STORAGES is the canonical way
+# Django 4.2+ storage configuration
 STORAGES = {
     "default": {
-        "BACKEND": ("cloudinary_storage.storage.MediaCloudinaryStorage"
-                    if _use_cloudinary
-                    else "django.core.files.storage.FileSystemStorage"),
+        "BACKEND": (
+            "cloudinary_storage.storage.MediaCloudinaryStorage"
+            if _use_cloudinary
+            else "django.core.files.storage.FileSystemStorage"
+        ),
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
