@@ -1,3 +1,4 @@
+
 import os
 from pathlib import Path
 from decouple import config
@@ -10,7 +11,6 @@ SECRET_KEY = os.environ.get(
     config('SECRET_KEY', default='django-insecure-dev-key-change-in-production'),
 )
 
-# --- DEBUG from env, defaults to False in production ---
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = [
@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Third party
-    'cloudinary_storage',   # keep BEFORE staticfiles
+    'cloudinary_storage',
     'cloudinary',
 
     # Local
@@ -78,12 +78,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'flash_dispatch.wsgi.application'
 
-# --- Database ---
-DATABASE_URL = os.environ.get('DATABASE_URL', config('DATABASE_URL', default=''))
+# Database
+DATABASE_URL = os.environ.get(
+    'DATABASE_URL',
+    config('DATABASE_URL', default='')
+)
 
 if DATABASE_URL and DATABASE_URL.startswith('postgresql'):
     try:
-        DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
+        DATABASES = {
+            'default': dj_database_url.parse(DATABASE_URL)
+        }
         DATABASES['default']['OPTIONS'] = {
             'options': '-c default_transaction_read_only=off',
             'client_encoding': 'UTF8',
@@ -116,12 +121,12 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# --- Static ---
+# Static files
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# --- Media / Cloudinary ---
+# Media / Cloudinary
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -147,7 +152,6 @@ CLOUDINARY_STORAGE = {
     'SECURE': True,
 }
 
-# Use Cloudinary when credentials are available
 _use_cloudinary = bool(
     CLOUDINARY_CLOUD_NAME
     and CLOUDINARY_API_KEY
@@ -168,9 +172,7 @@ STORAGES = {
     },
 }
 
-# Kept for libraries that still read the old name
-DEFAULT_FILE_STORAGE = STORAGES["default"]["BACKEND"]
-
+# Default settings
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -181,7 +183,7 @@ LOGOUT_REDIRECT_URL = 'landing:home'
 FILE_UPLOAD_PERMISSIONS = 0o644
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
 
-# --- Security ---
+# Security
 SECURE_SSL_REDIRECT = False
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -196,7 +198,7 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-# --- Email ---
+# Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
@@ -204,16 +206,40 @@ EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Flash Dispatch <noreply@flashdispatch.com>')
-CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', 'contact@flashdispatch.com')
 
+DEFAULT_FROM_EMAIL = os.environ.get(
+    'DEFAULT_FROM_EMAIL',
+    'Flash Dispatch <noreply@flashdispatch.com>'
+)
+
+CONTACT_EMAIL = os.environ.get(
+    'CONTACT_EMAIL',
+    'contact@flashdispatch.com'
+)
+
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'handlers': {'console': {'class': 'logging.StreamHandler'}},
-    'root': {'handlers': ['console'], 'level': 'INFO'},
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler'
+        }
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO'
+    },
     'loggers': {
-        'django':          {'handlers': ['console'], 'level': 'INFO', 'propagate': False},
-        'django.security': {'handlers': ['console'], 'level': 'INFO', 'propagate': False},
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False
+        },
+        'django.security': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False
+        },
     },
 }
